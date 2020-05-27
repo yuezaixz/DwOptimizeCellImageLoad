@@ -1,6 +1,0 @@
-framework module Pods_DwOptimizeCellImageLoad {
-  umbrella header "Pods-DwOptimizeCellImageLoad-umbrella.h"
-
-  export *
-  module * { export * }
-}
