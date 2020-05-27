@@ -54,18 +54,21 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension ViewController: UIScrollViewDelegate {
     
+    // 刚开始拖动，可以加载图片
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         finalPureLand = nil
         
         loadImageIfNeed()
     }
     
+    // 滚动过程中，如果手势跟随，加载图片
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if scrollView.isTracking {
             loadImageIfNeed()
         }
     }
     
+    // 手势放开，根据速度判断是否要启用内存加载机制
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         // 速度低的话，加载，速度快的话，等减速
         // 1 是个magicNum，DEMO项目不要太注意细节 =。。=
@@ -77,6 +80,7 @@ extension ViewController: UIScrollViewDelegate {
         }
     }
     
+    // 结束减速，正常加载图片
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         finalPureLand = nil
         loadImageIfNeed()
