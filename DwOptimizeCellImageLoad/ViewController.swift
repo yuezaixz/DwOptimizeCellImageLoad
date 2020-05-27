@@ -100,16 +100,18 @@ class ImageTableViewCell: UITableViewCell {
     }
     
     func loadImage(imageUrlStr: String) {
+        guard !isLoad else { return }
         isLoad = true
         avatarImageView.kf.setImage(with: URL(string: imageUrlStr))
     }
 
     func loadImage(imageUrlStr: String, landRect: CGRect?, cellFrame: CGRect) {
-        isLoad = true
+        guard !isLoad else { return }
         if let landRect = landRect, !landRect.intersects(cellFrame) {
             // 如果滑动中为减速，则只加载内存中的。
             // 如果加载硬盘中的，硬盘中的加载后要解析转换成位图，也会造成卡顿
             if let image = ImageCache.default.retrieveImageInMemoryCache(forKey: imageUrlStr) {
+                isLoad = true
                 avatarImageView.image = image
             }
         } else {
