@@ -60,13 +60,21 @@ extension ViewController: UIScrollViewDelegate {
         loadImageIfNeed()
     }
     
-    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        finalPureLand = CGRect(x: targetContentOffset.pointee.x, y: targetContentOffset.pointee.y, width: scrollView.frame.size.width, height: scrollView.frame.size.height)
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.isTracking {
+            loadImageIfNeed()
+        }
     }
     
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        finalPureLand = nil
-        loadImageIfNeed()
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        // 速度低的话，加载，速度快的话，等减速
+        // 1 是个magicNum，DEMO项目不要太注意细节 =。。=
+        if velocity.y > 1 {
+            finalPureLand = CGRect(x: targetContentOffset.pointee.x, y: targetContentOffset.pointee.y, width: scrollView.frame.size.width, height: scrollView.frame.size.height)
+        } else {
+            finalPureLand = nil
+            loadImageIfNeed()
+        }
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -97,6 +105,7 @@ class ImageTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         avatarImageView.image = nil
+        isLoad = false
     }
     
     func loadImage(imageUrlStr: String) {
