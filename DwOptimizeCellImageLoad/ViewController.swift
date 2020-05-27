@@ -15,6 +15,8 @@ class ViewController: UIViewController {
     
     var finalPureLand: CGRect?
     
+    var isDeceleratingOrStop = true
+    
     let imageUrlStrs = ["http://qiniu.xingheaoyou.com/1.jpg","http://qiniu.xingheaoyou.com/2.jpg","http://qiniu.xingheaoyou.com/3.jpg","http://qiniu.xingheaoyou.com/4.jpg","http://qiniu.xingheaoyou.com/5.jpg","http://qiniu.xingheaoyou.com/6.jpeg","http://qiniu.xingheaoyou.com/7.jpeg","http://qiniu.xingheaoyou.com/8.jpeg"]
 
     override func viewDidLoad() {
@@ -46,7 +48,10 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ImageTableViewCell.kReuseIdentifier, for: indexPath) as! ImageTableViewCell
-//        cell.loadImage(imageUrlStr: imageUrlStrs[indexPath.row % 8] + "?random=" + randomStrUtil.getRandomStringOfLength(length: 10))
+        if isDeceleratingOrStop && finalPureLand == nil {
+            let urlStr = indexPath.row / 10 % 5 == 1 ? imageUrlStrs[indexPath.row % 8] : (imageUrlStrs[indexPath.row % 8] + "?random=\(indexPath.row)")
+            cell.loadImage(imageUrlStr: urlStr)
+        }
         return cell
     }
 }
@@ -55,6 +60,7 @@ extension ViewController: UIScrollViewDelegate {
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         finalPureLand = nil
+        isDeceleratingOrStop = false
         
         loadImageIfNeed()
     }
@@ -63,7 +69,12 @@ extension ViewController: UIScrollViewDelegate {
         finalPureLand = CGRect(x: targetContentOffset.pointee.x, y: targetContentOffset.pointee.y, width: scrollView.frame.size.width, height: scrollView.frame.size.height)
     }
     
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        isDeceleratingOrStop = true
+    }
+    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        isDeceleratingOrStop = true
         finalPureLand = nil
         loadImageIfNeed()
     }
@@ -105,40 +116,5 @@ class ImageTableViewCell: UITableViewCell {
             loadImage(imageUrlStr: imageUrlStr)
         }
     }
-    
-//    - (void)lvc_loadVisibleImageWithURL:(NSURL *)imageURL
-//                            targetRect:(NSValue *)aTargetRect
-//                             cellFrame:(CGRect)aCellFrame {
-//
-//        // 先判断当前imageView上的图片url 是否与当前要显示的url一致 如果一致的话就不走括号里的处理逻辑 使用当前的图片
-//        if (![[self sd_imageURL] isEqual:imageURL]) {
-//
-//            BOOL shouldLoadImage = YES;
-//            SDWebImageManager *manager = [SDWebImageManager sharedManager];
-//
-//            // self.targetRect是用来判断是否在减速过程当中
-//            // !CGRectIntersectsRect([self.targetRect CGRectValue], cellFrame)是用来判断出现的cell是否在目标区域
-//            // 4.这两个判断合起来的意思是:tableView正处于减速过程,显示的cell也不在目标区域才为真
-//            if (aTargetRect && !CGRectIntersectsRect([aTargetRect CGRectValue], aCellFrame)) {
-//
-//                SDImageCache *cache = [manager imageCache];
-//                NSString *key = [manager cacheKeyForURL:imageURL];
-//
-//                // 如果不存磁盘 只需要改成imageFromeMemoryCacheForkey:
-//                if (![cache imageFromDiskCacheForKey:key]) {
-//                    shouldLoadImage = NO;
-//                }
-//            }
-//
-//            UIImage *placeholderImage = [UIImage imageNamed:@""];
-//            //3. 加载图片
-//            if (shouldLoadImage) {
-//                [self lad_setImageFadeInWithURL:imageURL placeholderImage:placeholderImage];
-//            }else {
-//                self.image = placeholderImage;
-//            }
-//        }
-//
-//    }
     
 }
